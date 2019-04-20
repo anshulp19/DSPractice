@@ -188,6 +188,133 @@ public class DS_Heap {
 
     }
 
+    public List<Integer> topKFrequent(int[] nums, int k) {
+        /*
+        * https://leetcode.com/problems/top-k-frequent-elements/
+        * Given a non-empty array of integers, return the k most frequent elements.
+        *
+        * Input: nums = [1,1,1,2,2,3], k = 2
+        * Output: [1,2]
+        * */
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int elem: nums)
+            map.put(elem, map.getOrDefault(elem, 1) + 1);
+
+        PriorityQueue<Map.Entry<Integer, Integer>> pq = new PriorityQueue<>((a, b) -> a.getValue() - b.getValue());
+
+        for (Map.Entry<Integer, Integer> e: map.entrySet()) {
+            pq.add(e);
+            if (pq.size() > k)
+                pq.poll();
+        }
+
+        List<Integer> l = new ArrayList<>();
+        while(pq.size() > 0)
+            l.add(pq.poll().getKey());
+        Collections.reverse(l);
+
+        return l;
+    }
+
+    public int findKthLargest(int[] nums, int k) {
+        /*
+        * https://leetcode.com/problems/kth-largest-element-in-an-array/
+        * Find the kth largest element in an unsorted array.
+        * Note that it is the kth largest element in the sorted order, not the kth distinct element.
+        *
+        * Input: [3,2,1,5,6,4] and k = 2
+        * Output: 5
+        * */
+
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        for (int elem : nums) {
+            pq.offer(elem);
+            if (pq.size() > k)
+                pq.poll();
+        }
+
+        return pq.peek();
+
+    }
+
+    public List<String> topKFrequent(String[] words, int k) {
+        /*
+        * https://leetcode.com/problems/top-k-frequent-words
+        * Given a non-empty list of words, return the k most frequent elements.
+        * Your answer should be sorted by frequency from highest to lowest.
+        * If two words have the same frequency, then the word with the lower alphabetical order comes first.
+        *
+        * Input: ["i", "love", "leetcode", "i", "love", "coding"], k = 2
+        * Output: ["i", "love"]
+        *
+        * */
+        Map<String, Integer> map = new HashMap<>();
+        for (String elem: words)
+            map.put(elem, map.getOrDefault(elem, 0) + 1);
+
+        PriorityQueue<String> pq = new PriorityQueue<>((w1, w2) -> map.get(w1).equals(map.get(w2))
+            ? w2.compareTo(w1) : map.get(w1) - map.get(w2));
+
+        for (String word: map.keySet()) {
+            pq.offer(word);
+            if (pq.size() > k)
+                pq.poll();
+        }
+
+        List<String> ans = new ArrayList<>();
+        while (!pq.isEmpty())
+            ans.add(pq.poll());
+        Collections.reverse(ans);
+
+        return ans;
+
+    }
+
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        /*
+        * https://leetcode.com/problems/sliding-window-maximum/
+        * Given an array nums, there is a sliding window of size k which is moving from
+        * the very left of the array to the very right.
+        * You can only see the k numbers in the window. Each time the
+        * sliding window moves right by one position. Return the max sliding window.
+        *
+        * Input: nums = [1,3,-1,-3,5,3,6,7], and k = 3
+        * Output: [3,3,5,5,6,7]
+        *
+        * */
+
+        if (nums.length == 0 || nums.length < k)
+            return new int[0];
+
+        Deque<Integer> dq = new LinkedList<>();
+        List<Integer> l = new ArrayList<>();
+
+        int i;
+        for (i = 0; i < k; ++i) {
+            while(!dq.isEmpty() && nums[i] >= nums[dq.peekLast()])
+                dq.removeLast();
+            dq.addLast(i);
+        }
+
+        for (; i < nums.length; i++ ) {
+            l.add(nums[dq.peek()]);
+
+            while(!dq.isEmpty() && dq.peek() <= i - k)
+                dq.removeFirst();
+
+            while(!dq.isEmpty() && nums[i] >= nums[dq.peekLast()])
+                dq.removeLast();
+            dq.addLast(i);
+        }
+        l.add(nums[dq.peek()]);
+
+        int[] res = new int[l.size()];
+        for (int j = 0; j < l.size(); j++)
+            res[j] = l.get(j).intValue();
+
+        return res;
+    }
+
     public static void main(String[] args) {
         DS_Heap mHeap = new DS_Heap();
 
@@ -210,6 +337,27 @@ public class DS_Heap {
          System.out.println(mHeap.frequencySort("cccaaa"));
          System.out.println(mHeap.frequencySort("Aabb"));
         */
+
+        /*
+         System.out.println(mHeap.topKFrequent(new int[]{1, 1, 1, 2, 2, 3}, 2));
+         System.out.println(mHeap.topKFrequent(new int[]{1}, 1));
+        */
+
+        /*
+         System.out.println(mHeap.findKthLargest(new int[]{3, 2, 1, 5, 6, 4}, 2));
+         System.out.println(mHeap.findKthLargest(new int[]{3, 2, 3, 1, 2, 4, 5, 5, 6}, 4));
+        */
+
+        /*
+         System.out.println(mHeap.topKFrequent(new String[]{"i", "love", "leetcode", "i", "love", "coding"}, 2));
+         System.out.println(mHeap.topKFrequent(new String[]{"the", "day", "is", "sunny", "the", "the", "the", "sunny", "is", "is"}, 4));
+        */
+
+        /*
+         System.out.println(Arrays.toString(mHeap.maxSlidingWindow(new int[]{12, 1, 78, 90, 57, 89, 56}, 3)));
+         System.out.println(Arrays.toString(mHeap.maxSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3)));
+        */
+
     }
 
 }
